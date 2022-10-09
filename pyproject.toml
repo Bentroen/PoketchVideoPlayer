@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "bad-apple-in-poketch"
+name = "poketch-video-player"
 version = "0.1.0"
-description = "'Bad Apple' recreated in the Pokémon Platinum 'Dot Artist' Pokétch app."
+description = "Video player for the 'Dot Artist' Pokétch app from Pokémon DPPt."
 authors = ["Bentroen <bemcdc@gmail.com>"]
 license = "MIT"
 

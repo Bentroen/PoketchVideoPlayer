@@ -1,2 +1,3 @@
-# Bad Apple in Poketch
- 'Bad Apple' recreated in the Pokémon Platinum 'Dot Artist' Pokétch app.
+# Pokétch Video Player
+
+Video player for the 'Dot Artist' Pokétch app from Pokémon DPPt. It works by generating [DeSmuME](http://desmume.org/) Lua scripts for manipulating the memory region corresponding to the app's screen data.
