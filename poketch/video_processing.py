@@ -14,6 +14,8 @@ else:
     ProgressType = TypeVar("ProgressType")
 
 
+__all__ = ["process"]
+
 POINT_TABLE = [0] + ([255] * 255)
 POKETCH_PALETTE = [(112, 176, 112), (80, 128, 80), (56, 80, 40), (16, 40, 24)]
 POKETCH_SCREEN_SIZE = (24, 20)
@@ -116,7 +118,7 @@ def get_video_frames(
         yield img_pil
 
 
-def main(
+def process(
     input_path: str = "source.mp4",
     output_type: int = OutputType.NONE,
     output_dir: str = "frames",
@@ -155,4 +157,4 @@ if __name__ == "__main__":
     else:
         bar = None
 
-    main(output_type=OutputType.BOTH, progress=bar)
+    process(output_type=OutputType.BOTH, progress=bar)
