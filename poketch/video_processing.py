@@ -1,7 +1,7 @@
 import os
 from enum import IntEnum
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterator, Optional, Sequence, Tuple, TypeVar
+from typing import TYPE_CHECKING, Iterator, List, Optional, Sequence, Tuple, TypeVar
 
 import cv2
 from PIL import Image, ImageChops
@@ -130,7 +130,7 @@ def get_video_frames(
         yield img_pil
 
 
-def get_pixel_changes(a: Image.Image, b: Image.Image) -> int:
+def get_pixel_changes(a: Image.Image, b: Image.Image) -> List[tuple[int, int, int]]:
     """
     Given two images the 'P' mode and equal in size, return a
     list of 3-tuples containing the coordinates of pixels that
