@@ -15,18 +15,32 @@ def get_memory_address(x: int, y: int) -> str:
 def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     script = []
 
+    # Frame switching functions
+    for frame, changes in diffs.items():
+        script.append(f"f{frame} = function ()")
+        for x, y, color in changes:
+            address = get_memory_address(x, y)
+            script.append(f"  memory.writebyte({address}, {color})")
+        script.append("end")
+        script.append("")
+
+    # Frame table
+    script.append("local frames = {")
+    for frame in diffs.keys():
+        script.append(f"  [{frame}] = f{frame},")
+    script.append("}")
+    script.append("")
+
+    # Main loop
     script.append("start = emu.framecount()")
     script.append("while true do")
     script.append("  frame = emu.framecount()")
     script.append("  current = frame - start")
-
-    for frame, changes in diffs.items():
-        script.append(f"  if current == {frame} then")
-        for x, y, color in changes:
-            address = get_memory_address(x, y)
-            script.append(f"    memory.writebyte({address}, {color})")
-        script.append("  end")
-
+    script.append("  local func = frames[current]")
+    script.append("    if (func) then")
+    script.append('      print("Playing frame", current)')
+    script.append("      func()")
+    script.append("    end")
     script.append("  emu.frameadvance()")
     script.append("end")
 
