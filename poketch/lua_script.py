@@ -39,7 +39,7 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     script.append("start = emu.framecount()")
     script.append("while true do")
     script.append("  frame = emu.framecount()")
-    script.append("  current = frame - start")
+    script.append("  current = (frame - start) / 2")
     script.append("  local func = frames[current]")
     script.append("    if (func) then")
     script.append('      print("Playing frame", current)')
