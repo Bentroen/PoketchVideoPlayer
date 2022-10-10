@@ -21,6 +21,10 @@ POKETCH_PALETTE = [(112, 176, 112), (80, 128, 80), (56, 80, 40), (16, 40, 24)]
 POKETCH_SCREEN_SIZE = (24, 20)
 POKETCH_SCREEN_SIZE_PX = (192, 160)
 
+Color = Tuple[int, int, int]
+Palette = Sequence[Color]
+Size = Tuple[int, int]
+
 
 class OutputType(IntEnum):
     NONE = 0
@@ -48,7 +52,7 @@ def difference(a: Image.Image, b: Image.Image, onion_opacity: int = 0.0) -> Imag
     return final
 
 
-def get_palette(colors=Sequence[tuple[int, int, int]]) -> Image.Image:
+def get_palette(colors: Palette) -> Image.Image:
     """
     Return a Pillow `Image` of a palette containing the given `colors`.
     """
@@ -65,7 +69,7 @@ def quantize(img: Image.Image, palette: Image.Image) -> Image.Image:
     return img.quantize(palette=palette, dither=Image.Dither.NONE)
 
 
-def resize_nearest(img: Image.Image, size: Tuple[int, int]) -> Image.Image:
+def resize_nearest(img: Image.Image, size: Size) -> Image.Image:
     """
     Resize `img` to the given `size` using nearest-neighbor interpolation.
     """
@@ -97,7 +101,7 @@ def get_video_frame_count(input_path) -> int:
 
 
 def get_video_frames(
-    path: os.PathLike, resize: Tuple[int, int] = None
+    path: os.PathLike, resize: Optional[Size] = None
 ) -> Iterator[Image.Image]:
     """
     Yield Pillow `Image`s of each frame of the video located at `path`,
