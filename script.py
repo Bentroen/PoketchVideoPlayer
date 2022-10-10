@@ -1,10 +1,18 @@
 import os
 from enum import IntEnum
 from pathlib import Path
-from typing import Iterator, Sequence, Tuple
+from typing import TYPE_CHECKING, Iterator, Optional, Sequence, Tuple, TypeVar
 
 import cv2
 from PIL import Image, ImageChops
+
+if TYPE_CHECKING:
+    import progressbar
+
+    ProgressType = progressbar.ProgressBar
+else:
+    ProgressType = TypeVar("ProgressType")
+
 
 POINT_TABLE = [0] + ([255] * 255)
 POKETCH_PALETTE = [(112, 176, 112), (80, 128, 80), (56, 80, 40), (16, 40, 24)]
@@ -81,17 +89,20 @@ def stack(a: Image.Image, b: Image.Image) -> Image.Image:
     return img
 
 
+def get_video_frame_count(input_path) -> int:
+    vidcap = cv2.VideoCapture(input_path)
+    return int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+
 def get_video_frames(
     path: os.PathLike, resize: Tuple[int, int] = None
-) -> Iterator[Tuple[Image.Image, int, int]]:
+) -> Iterator[Image.Image]:
     """
     Yield Pillow `Image`s of each frame of the video located at `path`,
     resized to `resize` (an optional 2-tuple containing the new size).
     """
     vidcap = cv2.VideoCapture(path)
     success, img = vidcap.read()
-    count = 0
-    frame_count = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1
     while success:
         success, img = vidcap.read()
         if img is None:
@@ -102,8 +113,7 @@ def get_video_frames(
             resized = img
         img_converted = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
         img_pil = Image.fromarray(img_converted)
-        yield (img_pil, count, frame_count)
-        count += 1
+        yield img_pil
 
 
 def main(
@@ -112,16 +122,15 @@ def main(
     output_dir: str = "frames",
     diff_opacity: float = 0.25,
     output_upscale_factor: int = 8,
+    progress: Optional[ProgressType] = None,
 ):
     prev_frame = Image.new("P", POKETCH_SCREEN_SIZE, color=(0, 0, 0))
     palette = get_palette(POKETCH_PALETTE)
-
-    for frame, count, total in get_video_frames(input_path, resize=POKETCH_SCREEN_SIZE):
-        print(f"Read a new frame: {count + 1}/{total}")
+    for i, frame in enumerate(get_video_frames(input_path, resize=POKETCH_SCREEN_SIZE)):
         frame_quantized = quantize(frame, palette)
         diff = difference(prev_frame, frame_quantized, diff_opacity)
 
-        output_path = Path(output_dir) / f"{count:04d}.png"
+        output_path = Path(output_dir) / f"{i:04d}.png"
         if output_type == OutputType.FRAMES:
             upscale(frame_quantized, output_upscale_factor).save(output_path)
         elif output_type == OutputType.DIFF:
@@ -131,7 +140,19 @@ def main(
             upscale(stacked, output_upscale_factor).save(output_path)
 
         prev_frame = frame_quantized
+        progress.update(i)
 
 
 if __name__ == "__main__":
-    main(output_type=OutputType.BOTH)
+    try:
+        import progressbar
+    except ImportError:
+        progressbar = None
+
+    if progressbar:
+        frame_count = get_video_frame_count("source.mp4")
+        bar = progressbar.ProgressBar(max_value=frame_count)
+    else:
+        bar = None
+
+    main(output_type=OutputType.BOTH, progress=bar)
