@@ -51,8 +51,9 @@ def onion_skin(a: Image.Image, b: Image.Image, onion_opacity: int = 0.0) -> Imag
     If `onion_opacity` is greater than 0, all other pixels will be set
     to that opacity; otherwise, they will be fully transparent.
     """
-    diff = difference(a, b).convert("RGBA")
-    diff.paste(b, mask=diff)
+    diff = difference(a, b)
+    new = diff.convert("RGBA")
+    new.paste(b, mask=diff)
     alpha = round(onion_opacity * 255)
     final = b.copy().convert("RGBA")
     final.putalpha(alpha)
