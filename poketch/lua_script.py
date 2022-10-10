@@ -24,20 +24,6 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
         for i, (x, y, color) in enumerate(changes):
             address = get_memory_address(x, y)
             script.append(f"  memory.writebyte({address}, {COLOR_LUT[color]})")
-            if i == len(changes) - 1:
-                # Touch the last pixel to trigger a redraw
-                tx, ty = (SCREEN_OFFSET_PX[0] + (x * 8), SCREEN_OFFSET_PX[1] + (y * 8))
-                tcolor = color - 1
-                if tcolor < 0:
-                    tcolor = 3
-                script.append(f"  memory.writebyte({address}, {tcolor})")
-                script.append(
-                    f"  stylus.write{{touch=false}} emu.frameadvance() emu.frameadvance()"
-                )
-                script.append(
-                    f"  stylus.write{{{tx}, {ty}, touch=true}} emu.frameadvance() emu.frameadvance()"
-                )
-                script.append(f'  print("Touching {tx}, {ty}")')
         script.append("end")
         script.append("")
 
@@ -49,6 +35,7 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     script.append("")
 
     # Main loop
+    script.append("local l = 0")
     script.append("start = emu.framecount()")
     script.append("while true do")
     script.append("  frame = emu.framecount()")
@@ -58,6 +45,11 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     script.append('      print("Playing frame", current)')
     script.append("      func()")
     script.append("    end")
+    script.append("  l = l + 0.5")
+    script.append("  if l >= 2 then")
+    script.append("    l = 0")
+    script.append("  end")
+    script.append("  stylus.set{x=192 + l * 8, y=168, touch=true}")
     script.append("  emu.frameadvance()")
     script.append("end")
 
