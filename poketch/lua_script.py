@@ -6,6 +6,7 @@ TOP_LEFT_ADDRESS = 0x0238F9E8
 
 SCREEN_SIZE = (24, 20)
 SCREEN_SIZE_PX = (192, 160)
+SCREEN_OFFSET_PX = (16, 16)
 
 COLOR_LUT = [1, 2, 3, 0]
 
@@ -20,9 +21,23 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     # Frame switching functions
     for frame, changes in diffs.items():
         script.append(f"f{frame} = function ()")
-        for x, y, color in changes:
+        for i, (x, y, color) in enumerate(changes):
             address = get_memory_address(x, y)
             script.append(f"  memory.writebyte({address}, {COLOR_LUT[color]})")
+            if i == len(changes) - 1:
+                # Touch the last pixel to trigger a redraw
+                tx, ty = (SCREEN_OFFSET_PX[0] + (x * 8), SCREEN_OFFSET_PX[1] + (y * 8))
+                tcolor = color - 1
+                if tcolor < 0:
+                    tcolor = 3
+                script.append(f"  memory.writebyte({address}, {tcolor})")
+                script.append(
+                    f"  stylus.write{{touch=false}} emu.frameadvance() emu.frameadvance()"
+                )
+                script.append(
+                    f"  stylus.write{{{tx}, {ty}, touch=true}} emu.frameadvance() emu.frameadvance()"
+                )
+                script.append(f'  print("Touching {tx}, {ty}")')
         script.append("end")
         script.append("")
 
