@@ -122,6 +122,27 @@ def get_video_frames(
         yield img_pil
 
 
+def get_pixel_changes(a: Image.Image, b: Image.Image) -> int:
+    """
+    Given two images the 'P' mode and equal in size, return a
+    list of 3-tuples containing the coordinates of pixels that
+    changed between the two images, and the index of the color
+    they changed to.
+    """
+    changes = []
+    if a.size != b.size:
+        raise ValueError("Images must be the same size")
+    if a.mode != "P" or b.mode != "P":
+        raise ValueError("Images must be in palette mode")
+    for y in range(a.height):
+        for x in range(a.width):
+            old = a.getpixel((x, y))
+            new = b.getpixel((x, y))
+            if old != new:
+                changes.append((x, y, new))
+    return changes
+
+
 def process(
     input_path: str = "source.mp4",
     output_type: int = OutputType.NONE,
@@ -130,8 +151,10 @@ def process(
     output_upscale_factor: int = 8,
     progress: Optional[ProgressType] = None,
 ):
-    prev_frame = Image.new("P", POKETCH_SCREEN_SIZE, color=(0, 0, 0))
+    prev_frame = Image.new("P", POKETCH_SCREEN_SIZE, color=len(POKETCH_PALETTE))
     palette = get_palette(POKETCH_PALETTE)
+    diffs = {}
+
     for i, frame in enumerate(get_video_frames(input_path, resize=POKETCH_SCREEN_SIZE)):
         frame_quantized = quantize(frame, palette)
         diff = difference(prev_frame, frame_quantized, diff_opacity)
@@ -145,8 +168,14 @@ def process(
             stacked = stack(frame_quantized, diff)
             upscale(stacked, output_upscale_factor).save(output_path)
 
+        changed_pixels = get_pixel_changes(prev_frame, frame_quantized)
+        if changed_pixels is not None:
+            diffs[i] = changed_pixels
+
         prev_frame = frame_quantized
         progress.update(i)
+
+    return diffs
 
 
 if __name__ == "__main__":
@@ -155,10 +184,14 @@ if __name__ == "__main__":
     except ImportError:
         progressbar = None
 
+    import json
+
     if progressbar:
         frame_count = get_video_frame_count("source.mp4")
         bar = progressbar.ProgressBar(max_value=frame_count)
     else:
         bar = None
 
-    process(output_type=OutputType.BOTH, progress=bar)
+    diffs = process(output_type=OutputType.BOTH, progress=bar)
+    with open("diffs.json", "w") as f:
+        json.dump(diffs, f, indent=4, separators=(",", ": "))
