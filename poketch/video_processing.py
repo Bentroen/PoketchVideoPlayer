@@ -174,7 +174,7 @@ def process(
     for i, frame in enumerate(get_video_frames(input_path, resize=POKETCH_SCREEN_SIZE)):
         frame_quantized = quantize(frame, palette)
         changed_pixels = get_pixel_changes(prev_frame, frame_quantized)
-        if changed_pixels is not None:
+        if changed_pixels:
             diffs[i] = changed_pixels
 
         if output_type != OutputType.NONE:
