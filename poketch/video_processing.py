@@ -33,18 +33,26 @@ class OutputType(IntEnum):
     BOTH = 3
 
 
-def difference(a: Image.Image, b: Image.Image, onion_opacity: int = 0.0) -> Image.Image:
+def difference(a: Image.Image, b: Image.Image) -> Image.Image:
     """
-    Return an image containing the different pixels between two images.
-    If `onion_opacity` is greater than 0, all other pixels will be set
-    to that opacity; otherwise, they will be fully transparent.
+    Return a mask of the different pixels between two images
+    (all different pixels set to 255 and all equal pixels set to 0).
     """
     # https://stackoverflow.com/a/16721373/9045426
     diff = ImageChops.difference(a, b)
     diff = diff.convert("L")
     diff = diff.point(POINT_TABLE)
-    new = diff.convert("RGBA")
-    new.paste(b, mask=diff)
+    return diff
+
+
+def onion_skin(a: Image.Image, b: Image.Image, onion_opacity: int = 0.0) -> Image.Image:
+    """
+    Return an image containing the different pixels between two images.
+    If `onion_opacity` is greater than 0, all other pixels will be set
+    to that opacity; otherwise, they will be fully transparent.
+    """
+    diff = difference(a, b).convert("RGBA")
+    diff.paste(b, mask=diff)
     alpha = round(onion_opacity * 255)
     final = b.copy().convert("RGBA")
     final.putalpha(alpha)
@@ -157,7 +165,7 @@ def process(
 
     for i, frame in enumerate(get_video_frames(input_path, resize=POKETCH_SCREEN_SIZE)):
         frame_quantized = quantize(frame, palette)
-        diff = difference(prev_frame, frame_quantized, diff_opacity)
+        diff = onion_skin(prev_frame, frame_quantized, diff_opacity)
 
         output_path = Path(output_dir) / f"{i:04d}.png"
         if output_type == OutputType.FRAMES:
