@@ -1,4 +1,5 @@
 import os
+import sys
 from enum import IntEnum
 from pathlib import Path
 from typing import TYPE_CHECKING, Iterator, List, Optional, Sequence, Tuple, TypeVar
@@ -159,7 +160,7 @@ def get_pixel_changes(a: Image.Image, b: Image.Image) -> List[tuple[int, int, in
 
 
 def process(
-    input_path: str = "source.mp4",
+    input_path: str,
     output_type: int = OutputType.NONE,
     output_dir: str = "frames",
     diff_opacity: float = 0.25,
@@ -194,6 +195,10 @@ def process(
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print(f"Usage: python3 {sys.argv[0]} <input_path>")
+        sys.exit(1)
+
     try:
         import progressbar
     except ImportError:
@@ -202,11 +207,13 @@ if __name__ == "__main__":
     import json
 
     if progressbar:
-        frame_count = get_video_frame_count("source.mp4")
+        frame_count = get_video_frame_count(sys.argv[1])
         bar = progressbar.ProgressBar(max_value=frame_count)
     else:
         bar = None
 
-    diffs = process(output_type=OutputType.BOTH, progress=bar)
+    input_path = sys.argv[1]
+    print(f"Processing {input_path}")
+    diffs = process(input_path, output_type=OutputType.BOTH, progress=bar)
     with open("diffs.json", "w") as f:
         json.dump(diffs, f, indent=4, separators=(",", ": "))
