@@ -7,6 +7,8 @@ TOP_LEFT_ADDRESS = 0x0238F9E8
 SCREEN_SIZE = (24, 20)
 SCREEN_SIZE_PX = (192, 160)
 
+COLOR_LUT = [1, 2, 3, 0]
+
 
 def get_memory_address(x: int, y: int) -> str:
     return hex(TOP_LEFT_ADDRESS + (y * SCREEN_SIZE[0]) + x)
@@ -20,7 +22,7 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
         script.append(f"f{frame} = function ()")
         for x, y, color in changes:
             address = get_memory_address(x, y)
-            script.append(f"  memory.writebyte({address}, {color})")
+            script.append(f"  memory.writebyte({address}, {COLOR_LUT[color]})")
         script.append("end")
         script.append("")
 
