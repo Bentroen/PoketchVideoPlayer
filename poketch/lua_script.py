@@ -9,7 +9,7 @@ SCREEN_SIZE_PX = (192, 160)
 
 
 def get_memory_address(x: int, y: int) -> str:
-    return hex(TOP_LEFT_ADDRESS + (y * SCREEN_SIZE[1]) + x)
+    return hex(TOP_LEFT_ADDRESS + (y * SCREEN_SIZE[0]) + x)
 
 
 def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
