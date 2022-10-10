@@ -137,16 +137,22 @@ def get_pixel_changes(a: Image.Image, b: Image.Image) -> int:
     changed between the two images, and the index of the color
     they changed to.
     """
-    changes = []
     if a.size != b.size:
         raise ValueError("Images must be the same size")
     if a.mode != "P" or b.mode != "P":
         raise ValueError("Images must be in palette mode")
-    for y in range(a.height):
-        for x in range(a.width):
-            old = a.getpixel((x, y))
-            new = b.getpixel((x, y))
-            if old != new:
+
+    diff = difference(a, b)
+    bbox = diff.getbbox()
+    if bbox is None:
+        return []
+
+    changes = []
+    x1, y1, x2, y2 = bbox
+    for y in range(y1, y2):
+        for x in range(x1, x2):
+            if diff.getpixel((x, y)) == 255:
+                new = b.getpixel((x, y))
                 changes.append((x, y, new))
     return changes
 
