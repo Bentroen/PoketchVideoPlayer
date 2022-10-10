@@ -171,20 +171,20 @@ def process(
 
     for i, frame in enumerate(get_video_frames(input_path, resize=POKETCH_SCREEN_SIZE)):
         frame_quantized = quantize(frame, palette)
-        diff = onion_skin(prev_frame, frame_quantized, diff_opacity)
-
-        output_path = Path(output_dir) / f"{i:04d}.png"
-        if output_type == OutputType.FRAMES:
-            upscale(frame_quantized, output_upscale_factor).save(output_path)
-        elif output_type == OutputType.DIFF:
-            upscale(diff, output_upscale_factor).save(output_path)
-        elif output_type == OutputType.BOTH:
-            stacked = stack(frame_quantized, diff)
-            upscale(stacked, output_upscale_factor).save(output_path)
-
         changed_pixels = get_pixel_changes(prev_frame, frame_quantized)
         if changed_pixels is not None:
             diffs[i] = changed_pixels
+
+        if output_type != OutputType.NONE:
+            diff = onion_skin(prev_frame, frame_quantized, diff_opacity)
+            output_path = Path(output_dir) / f"{i:04d}.png"
+            if output_type == OutputType.FRAMES:
+                upscale(frame_quantized, output_upscale_factor).save(output_path)
+            elif output_type == OutputType.DIFF:
+                upscale(diff, output_upscale_factor).save(output_path)
+            elif output_type == OutputType.BOTH:
+                stacked = stack(frame_quantized, diff)
+                upscale(stacked, output_upscale_factor).save(output_path)
 
         prev_frame = frame_quantized
         progress.update(i)
