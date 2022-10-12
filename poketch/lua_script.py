@@ -28,15 +28,16 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     # Frame switching functions
     for frame, changes in diffs.items():
         script.append(f"f{frame} = function ()")
-        for i, (x, y, color) in enumerate(changes):
+        for x, y, color in changes:
+            color += 1  # Color memory values range from 1-4, not 0-3
             address = get_memory_address(x, y)
-            script.append(f"  memory.writebyte({address}, {color + 1})")
+            script.append(f"  memory.writebyte({address}, {color})")
             # Store color of the two last pixels, minus one, for touch correction
             if y == SCREEN_SIZE[1] - 1:
                 if x == SCREEN_SIZE[0] - 1:
-                    script.append(f"  br1 = {wrap(color, 1, 4)}")
+                    script.append(f"  br1 = {wrap(color - 1, 1, 4)}")
                 elif x == SCREEN_SIZE[0] - 2:
-                    script.append(f"  br2 = {wrap(color, 1, 4)}")
+                    script.append(f"  br2 = {wrap(color - 1, 1, 4)}")
         script.append("end")
         script.append("")
 
