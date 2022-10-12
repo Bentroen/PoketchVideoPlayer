@@ -14,6 +14,14 @@ def get_memory_address(x: int, y: int) -> str:
     return hex(TOP_LEFT_ADDRESS + (y * SCREEN_SIZE[0]) + x)
 
 
+def wrap(value: int, min: int, max: int) -> int:
+    if value < min:
+        return max
+    elif value > max:
+        return min
+    return value
+
+
 def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     script = []
 
@@ -23,6 +31,12 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
         for i, (x, y, color) in enumerate(changes):
             address = get_memory_address(x, y)
             script.append(f"  memory.writebyte({address}, {color + 1})")
+            # Store color of the two last pixels, minus one, for touch correction
+            if y == SCREEN_SIZE[1] - 1:
+                if x == SCREEN_SIZE[0] - 1:
+                    script.append(f"  br1 = {wrap(color, 1, 4)}")
+                elif x == SCREEN_SIZE[0] - 2:
+                    script.append(f"  br2 = {wrap(color, 1, 4)}")
         script.append("end")
         script.append("")
 
@@ -35,6 +49,8 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
 
     # Main loop
     script.append("local l = 0")
+    script.append("br1 = 0")
+    script.append("br2 = 0")
     script.append("start = emu.framecount()")
     script.append("while true do")
     script.append("  frame = emu.framecount()")
@@ -52,13 +68,13 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     # they should be in, so that the touch leaves them in the correct state)
     bottom_right_address1 = get_memory_address(SCREEN_SIZE[0] - 1, SCREEN_SIZE[1] - 1)
     bottom_right_address2 = get_memory_address(SCREEN_SIZE[0] - 2, SCREEN_SIZE[1] - 1)
-    script.append(f"  local br1 = memory.readbyte({bottom_right_address1}) - 1")
-    script.append(f"  local br2 = memory.readbyte({bottom_right_address2}) - 1")
-    script.append(f"  if br1 < 0 then brm1 = 3 end")
-    script.append(f"  if br2 < 0 then brm2 = 3 end")
-    script.append(f"  memory.writebyte({bottom_right_address1}, br1)")
-    script.append(f"  memory.writebyte({bottom_right_address2}, br2)")
-    script.append("  stylus.set{x=192 + l * 8, y=168, touch=true}")
+    script.append("  local x = 192 + l * 8")
+    script.append("  if x >= 199 then")
+    script.append(f"    memory.writebyte({bottom_right_address1}, br1)")
+    script.append("  else")
+    script.append(f"    memory.writebyte({bottom_right_address2}, br2)")
+    script.append("  end")
+    script.append("  stylus.set{x=x, y=168, touch=true}")
     script.append("  emu.frameadvance()")
     script.append("end")
 
