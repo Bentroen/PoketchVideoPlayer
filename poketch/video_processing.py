@@ -134,7 +134,7 @@ def get_video_frames(
 
 def get_pixel_changes(a: Image.Image, b: Image.Image) -> List[tuple[int, int, int]]:
     """
-    Given two images the 'P' mode and equal in size, return a
+    Given two images in the 'P' mode and equal in size, return a
     list of 3-tuples containing the coordinates of pixels that
     changed between the two images, and the index of the color
     they changed to.
