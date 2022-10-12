@@ -8,6 +8,7 @@ SCREEN_SIZE = (24, 20)
 SCREEN_SIZE_PX = (192, 160)
 SCREEN_OFFSET_PX = (16, 16)
 
+NOISE_FRAMES = 30
 
 
 def get_memory_address(x: int, y: int) -> str:
@@ -24,6 +25,19 @@ def wrap(value: int, min: int, max: int) -> int:
 
 def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     script = []
+
+    # Random noise function
+    script.append("function noise()")
+    script.append(f"  for y = 0, {SCREEN_SIZE[1] - 1} do")
+    script.append(f"    for x = 0, {SCREEN_SIZE[0] - 1} do")
+    script.append(
+        f"      memory.writebyte({TOP_LEFT_ADDRESS} + y * {SCREEN_SIZE[0]} + x, math.random(1, 3))"
+    )
+    script.append("    end")
+    script.append("  end")
+    script.append("br1 = math.random(1, 2)")
+    script.append("br2 = math.random(1, 2)")
+    script.append("end")
 
     # Frame switching functions
     for frame, changes in diffs.items():
@@ -56,11 +70,15 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     script.append("while true do")
     script.append("  frame = emu.framecount()")
     script.append("  current = (frame - start) / 2")
-    script.append("  local func = frames[current]")
-    script.append("    if (func) then")
-    script.append('      print("Playing frame", current)')
-    script.append("      func()")
-    script.append("    end")
+    script.append(f"  if current <= {NOISE_FRAMES} then")
+    script.append("    noise()")
+    script.append("  else")
+    script.append(f"    local func = frames[current - {NOISE_FRAMES + 1}]")
+    script.append("      if (func) then")
+    script.append('        print("Playing frame", current)')
+    script.append("        func()")
+    script.append("      end")
+    script.append("  end")
     script.append("  l = l + 4")
     script.append("  if l >= 16 then l = 0 end")
     # Touch screen to trigger redraw (we set the pixels one step behind what
