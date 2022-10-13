@@ -21,7 +21,9 @@ def wrap(value: int, min: int, max: int) -> int:
     return value
 
 
-def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
+def generate_script(
+    diffs: Dict[int, Sequence[tuple[int, int, int]]], noise_frames: int = NOISE_FRAMES
+) -> str:
     script = []
 
     # Random noise function
@@ -68,10 +70,10 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
     script.append("while true do")
     script.append("  frame = emu.framecount()")
     script.append("  current = (frame - start) / 2")
-    script.append(f"  if current <= {NOISE_FRAMES} then")
+    script.append(f"  if current <= {noise_frames} then")
     script.append("    noise()")
     script.append("  else")
-    script.append(f"    local func = frames[current - {NOISE_FRAMES + 1}]")
+    script.append(f"    local func = frames[current - {noise_frames + 1}]")
     script.append("      if (func) then")
     script.append('        print("Playing frame", current)')
     script.append("        func()")
