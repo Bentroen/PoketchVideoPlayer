@@ -1,5 +1,8 @@
 from typing import Dict, Sequence
 
+__all__ = ["generate_script"]
+
+
 TOP_LEFT_ADDRESS = 0x0238F9E8
 
 SCREEN_SIZE = (24, 20)

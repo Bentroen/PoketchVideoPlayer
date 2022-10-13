@@ -15,7 +15,7 @@ else:
     ProgressType = TypeVar("ProgressType")
 
 
-__all__ = ["process"]
+__all__ = ["OutputType", "get_video_frame_count", "process"]
 
 POINT_TABLE = [0] + ([255] * 255)
 POKETCH_PALETTE = [(112, 176, 112), (80, 128, 80), (56, 80, 40), (16, 40, 24)]
