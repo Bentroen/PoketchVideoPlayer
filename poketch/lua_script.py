@@ -1,7 +1,5 @@
 from typing import Dict, Sequence
 
-import video_processing
-
 TOP_LEFT_ADDRESS = 0x0238F9E8
 
 SCREEN_SIZE = (24, 20)
@@ -98,12 +96,12 @@ def generate_script(diffs: Dict[int, Sequence[tuple[int, int, int]]]):
 
 
 if __name__ == "__main__":
-    import progressbar
+    import json
 
-    diffs = video_processing.process(
-        input_path="source.mp4",
-        progress=progressbar.ProgressBar(max_value=progressbar.UnknownLength),
-    )
+    with open("diffs.json") as f:
+        diffs = json.load(f)
+
     script = generate_script(diffs)
+
     with open("script.lua", "w") as f:
         f.write("\n".join(script))
