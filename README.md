@@ -24,7 +24,7 @@ This script currently only works on Pokémon Platinum, US version. It may work o
 
 ### Generating the script
 
-1. Get a copy of the video and move it to the root folder as `source.mp4`.
+1. Get a copy of the video.
 1. Make sure to have [poetry](https://python-poetry.org) installed, and run:
 
     ```shell
@@ -34,8 +34,10 @@ This script currently only works on Pokémon Platinum, US version. It may work o
 1. To generate the script, run:
 
     ```shell
-    $ python3 poketch <source>
+    $ python3 poketch <source> <output>
     ```
+
+    with `<source>` being the input video file and `<output>` being the name of the generated script, ending in `.lua`.
 
 > Tip: A number of options are available during generation. Run `python3 poketch --help` to see them.
 
@@ -45,7 +47,7 @@ This script currently only works on Pokémon Platinum, US version. It may work o
 1. Download Lua binaries for DeSmuME from [here](https://sourceforge.net/projects/luabinaries/files/5.1.4/Windows%20Libraries/) (make sure to match the architecture of your DeSmuME installation).
 1. Move `lua51.dll` and `lua5.1.dll` to the same folder as the DeSmuME executable.
 1. Open DeSmuME and load Pokémon Platinum.
-1. Open the 'Dot Artist' Pokétch app.
+1. Open the '[Dot Artist](https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9tch#Dot_Artist)' Pokétch app.
 1. Open the Lua scripting menu (Tools > Lua Scripting > New Lua Script Window...).
 1. Open the generated script and click 'Run'.
 1. Watch the magic happen!
