@@ -2,6 +2,8 @@
 
 Video player for the 'Dot Artist' Pokétch app from Pokémon DPPt. It works by generating [DeSmuME](http://desmume.org/) Lua scripts for manipulating the memory region corresponding to the app's screen data.
 
+The app's screen is composed of a 24x20 pixel grid of 8x8 pixel tiles. Each tile can have four different colors, which alternate by touching each pixel.
+
 ## Usage
 
 This script currently only works on Pokémon Platinum, US version. It may work on other versions, but it's unlikely due to different memory mappings.
