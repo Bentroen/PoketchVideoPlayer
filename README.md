@@ -1,5 +1,9 @@
 # Pokétch Video Player
 
+<p align="center">
+     <img src="https://user-images.githubusercontent.com/29354120/214530159-06652ae1-4875-4c30-b067-0e61c98159d6.png" width="500">
+</p>
+
 Video player for the 'Dot Artist' Pokétch app from Pokémon DPPt. It works by generating [DeSmuME](http://desmume.org/) Lua scripts for manipulating the memory region corresponding to the app's screen data.
 
 The app's screen is composed of a 24x20 pixel grid of 8x8 pixel tiles. Each tile can have four different colors, which alternate by touching each pixel.
