@@ -4,6 +4,8 @@ Video player for the 'Dot Artist' Pokétch app from Pokémon DPPt. It works by g
 
 The app's screen is composed of a 24x20 pixel grid of 8x8 pixel tiles. Each tile can have four different colors, which alternate by touching each pixel.
 
+[(Demo video)](https://youtu.be/_p1q9_shSTw)
+
 ## Usage
 
 This script currently only works on Pokémon Platinum, US version. It may work on other versions, but it's unlikely due to different memory mappings.
@@ -11,15 +13,27 @@ This script currently only works on Pokémon Platinum, US version. It may work o
 ### Prerequisites
 
 -   [DeSmuME](http://desmume.org/) (tested with 0.9.13)
--   [Python 3](https://www.python.org/downloads/) (tested with 3.10.4)
--   [Poetry](https://python-poetry.org/) (tested with 1.1.13)
--   [OpenCV](https://opencv.org/) (tested with 4.1.0)
--   [Pillow](https://pillow.readthedocs.io/en/stable/) (tested with 6.0.0)
+-   [Python 3](https://www.python.org/downloads/)
+-   [Poetry](https://python-poetry.org/)
+-   [OpenCV](https://opencv.org/)
+-   [Pillow](https://pillow.readthedocs.io/en/stable/)
 
 ### Generating the script
 
 1. Get a copy of the video and move it to the root folder as `source.mp4`.
-1. Run `python3 main.py` to generate the script.
+1. Make sure to have [poetry](https://python-poetry.org) installed, and run:
+
+    ```shell
+    $ poetry install
+    ```
+
+1. To generate the script, run:
+
+    ```shell
+    $ python3 poketch <source>
+    ```
+
+> Tip: A number of options are available during generation. Run `python3 poketch --help` to see them.
 
 ### Running
 
