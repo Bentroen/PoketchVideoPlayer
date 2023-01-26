@@ -88,7 +88,7 @@ def resize_nearest(img: Image.Image, size: Size) -> Image.Image:
 
 def upscale(img: Image.Image, factor: int) -> Image.Image:
     """
-    Resize `img` by `factor` and save it to `path`.
+    Resize `img` by `factor` using nearest-neighbor interpolation.
     """
     new_size = (img.width * factor, img.height * factor)
     return resize_nearest(img, new_size)
